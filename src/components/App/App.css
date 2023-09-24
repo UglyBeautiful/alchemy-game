@@ -1,0 +1,26 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.app {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+.header {
+  grid-area: 1 / 1 / 2 / 6;
+}
+.menu-bar {
+  grid-area: 2 / 1 / 5 / 2;
+}
+.footer-bar {
+  grid-area: 5 / 1 / 6 / 6;
+}
+.play-field {
+  grid-area: 2 / 2 / 5 / 6;
+}

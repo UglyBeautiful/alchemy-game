@@ -1,0 +1,7 @@
+.drag-elem {
+  position: absolute;
+  width: fit-content;
+  height: fit-content;
+  cursor: pointer;
+  user-select: none;
+}
