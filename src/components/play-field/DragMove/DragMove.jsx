@@ -1,14 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 import "./DragMove.css";
+
+const getCoords = (ref) => {
+  return ref.current.getBoundingClientRect();
+};
 
 export default function DragMove(props) {
   const [previousTouch, setNewTouch] = useState({ clientX: 0, clientY: 0 });
 
-  const [position, setNewPosition] = useState({
-    top: 0 + "px",
-    left: 0 + "px",
-  });
+  const dmRef = useRef(null);
+  let dmCoord = undefined;
+
+  const [coords, setCoords] = useState(null);
+
+  const [positionY, setNewPositionY] = useState(100);
+  const [positionX, setNewPositionX] = useState(100);
+
+  // useEffect(() => {
+  //   dmCoord = dmRef.current.getBoundingClientRect();
+  //   console.log(dmCoord);
+  //   setCoords({
+  //     top: dmCoord.top,
+  //     bottom: dmCoord.bottom,
+  //     left: dmCoord.left,
+  //     right: dmCoord.right,
+  //   });
+  // }, [positionX, positionY]);
+
+  useEffect(() => {
+    dmCoord = dmRef.current.getBoundingClientRect();
+  }, []);
+
+  const positionSetting = (prev, movement) => {
+    const borders = props.borders;
+    setCoords(getCoords(dmRef));
+    console.log(borders.top, coords.top);
+    if (borders.top > coords.top) {
+      return borders.top;
+    } else if (borders.bottom < coords.bottom) {
+      return borders.bottom;
+    } else if (borders.left > coords.left) {
+      return borders.left;
+    } else if (borders.right < coords.right) {
+      return borders.right;
+    } else {
+      return prev + movement;
+    }
+  };
 
   function updateElementPosition(element, event) {
     var movementX, movementY;
@@ -22,20 +61,16 @@ export default function DragMove(props) {
       movementX = event.movementX;
       movementY = event.movementY;
     }
-    console.log(position.top + " pos elemstyle " + element.style.top);
-    const elementY = parseInt(element.style.top) + movementY;
-    const elementX = parseInt(element.style.left) + movementX;
+    // const elementY = parseInt(element.style.top) + movementY;
+    // const elementX = parseInt(element.style.left) + movementX;
 
-    // props.overflowCheck(elementX, elementY)
-    setNewPosition({ top: `${elementY}px`, left: `${elementX}px` });
-    // element.style.top = `${elementY}px`;
-    // element.style.left = `${elementX}px`;
+    setNewPositionY((prev) => positionSetting(prev, movementY));
+    setNewPositionX((prev) => positionSetting(prev, movementX));
   }
 
   //START DRAGGING PHOTOS
   function startDrag(element, event) {
     const updateFunction = (event) => {
-      console.log(1);
       event.preventDefault();
       updateElementPosition(element, event);
     };
@@ -59,14 +94,15 @@ export default function DragMove(props) {
   const startFunction = (event) => startDrag(event.target, event);
 
   return (
-    <div children={props.children}>
-      <img
-        style={position}
-        src={props.logo}
-        className="drag-elem"
-        onMouseDown={startFunction}
-        onTouchStart={startFunction}
-      />
+    <div
+      style={{ top: positionY, left: positionX }}
+      className="drag-elem"
+      children={props.children}
+      ref={dmRef}
+      onMouseDown={startFunction}
+      onTouchStart={startFunction}
+    >
+      <img src={props.logo} />
     </div>
   );
 }
